@@ -27,10 +27,7 @@ class ApiController extends Controller
             echo 'ios';
             $this -> ios($userInfo);
         }
-
-
     }
-
     //安卓登录 存入Redis
     public function Android($userInfo){
         $uid=$userInfo['id'];
@@ -47,6 +44,7 @@ class ApiController extends Controller
         }else{
             die('Android 已登录');
         }
+        //更新数据库状态
         $res = ApiModel::where(['id'=>$uid])->update(['type'=>$type]);
         if($res==false){
             echo '登录失败';
@@ -57,7 +55,7 @@ class ApiController extends Controller
     }
     //pc端登录
     public function pc($userInfo){
-        $uid = $userInfo['uid'];
+        $uid = $userInfo['id'];
         if ($userInfo['type']==1){
             //判断 安卓是否登录 已登录 改为4 是pc和安卓一起在线
            $type=4;
@@ -65,19 +63,15 @@ class ApiController extends Controller
             //判断 ios 是否在线 已在线 改为5  pc和ios一起在线
             $type=5;
         }else{
-            die('pc已登录');
+            die('pc 已登录');
         }
+        //更新数据库状态
         $res = ApiModel::where(['id'=>$uid])->update(['type'=>$type]);
         if($res===false){
             echo '登录失败';
-        }else{
-            echo 'ok';
         }
         $pc_token=rand(11111,99999);
         Redis::hset("userLogin:id:$uid",'pc_token',$pc_token);
-
-
-
     }
     //ios 登录
     public function ios($userInfo){
@@ -94,6 +88,7 @@ class ApiController extends Controller
         }else{
             die('ios 已登录');
         }
+        //更新数据库状态
         $res = ApiModel::where(['id'=>$uid])->update(['type'=>$type]);
         if($res===false){
             echo '登录失败';
